@@ -8,6 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="GeoCoordinate.NetCore" Version="1.0.0.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DbModel\TerminalDashboard.DbModel.csproj" />
+    <ProjectReference Include="..\TerminalDashboard.Common\TerminalDashboard.Common.csproj" />
   </ItemGroup>
 </Project>

@@ -22,15 +22,16 @@ namespace TerminalDashboard.Migrations.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("DbModel.Airplane", b =>
+            modelBuilder.Entity("TerminalDashboard.DbModel.Airplane", b =>
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("FirmID")
+                    b.Property<string>("FirmID")
                         .IsRequired()
-                        .HasColumnType("uniqueidentifier");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int>("TotalSeats")
                         .HasColumnType("int");
@@ -42,11 +43,54 @@ namespace TerminalDashboard.Migrations.Migrations
                     b.ToTable("Airplanes");
                 });
 
-            modelBuilder.Entity("DbModel.Firm", b =>
+            modelBuilder.Entity("TerminalDashboard.DbModel.Airport", b =>
                 {
-                    b.Property<Guid>("ID")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("ID");
+                    b.Property<string>("Ident")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Continent")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Coordinates")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Elevation_ft")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Gps_code")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Iata_code")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Iso_country")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Iso_region")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Local_code")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Municipality")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Ident");
+
+                    b.ToTable("Airports");
+                });
+
+            modelBuilder.Entity("TerminalDashboard.DbModel.Firm", b =>
+                {
+                    b.Property<string>("ID")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Name")
                         .HasMaxLength(200)
@@ -57,7 +101,7 @@ namespace TerminalDashboard.Migrations.Migrations
                     b.ToTable("Firms");
                 });
 
-            modelBuilder.Entity("DbModel.Flight", b =>
+            modelBuilder.Entity("TerminalDashboard.DbModel.Flight", b =>
                 {
                     b.Property<string>("ID")
                         .HasMaxLength(10)
@@ -70,23 +114,46 @@ namespace TerminalDashboard.Migrations.Migrations
                     b.Property<DateTime>("DepartureTime")
                         .HasColumnType("datetime");
 
-                    b.Property<Guid>("From")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("FromIdent")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("LandingTime")
                         .HasColumnType("datetime");
 
-                    b.Property<Guid>("To")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("ToIdent")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("ID");
 
                     b.HasIndex("AirplaneID");
 
+                    b.HasIndex("FromIdent");
+
+                    b.HasIndex("ToIdent");
+
                     b.ToTable("Flights");
                 });
 
-            modelBuilder.Entity("DbModel.Passenger", b =>
+            modelBuilder.Entity("TerminalDashboard.DbModel.Name", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("FirstName")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("LastName")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Name");
+                });
+
+            modelBuilder.Entity("TerminalDashboard.DbModel.Passenger", b =>
                 {
                     b.Property<Guid>("ID")
                         .HasColumnType("uniqueidentifier")
@@ -115,7 +182,7 @@ namespace TerminalDashboard.Migrations.Migrations
                     b.ToTable("Passengers");
                 });
 
-            modelBuilder.Entity("DbModel.Suitcase", b =>
+            modelBuilder.Entity("TerminalDashboard.DbModel.Suitcase", b =>
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
@@ -125,8 +192,7 @@ namespace TerminalDashboard.Migrations.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<Guid?>("OwnerId")
-                        .IsRequired()
+                    b.Property<Guid>("OwnerId")
                         .HasMaxLength(200)
                         .HasColumnType("uniqueidentifier");
 
@@ -143,31 +209,43 @@ namespace TerminalDashboard.Migrations.Migrations
                     b.ToTable("Suitcases");
                 });
 
-            modelBuilder.Entity("DbModel.Airplane", b =>
+            modelBuilder.Entity("TerminalDashboard.DbModel.Airplane", b =>
                 {
-                    b.HasOne("DbModel.Firm", "Firm")
+                    b.HasOne("TerminalDashboard.DbModel.Firm", "Firm")
                         .WithMany("Airplanes")
                         .HasForeignKey("FirmID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("FK_Airplanes_Firms");
 
                     b.Navigation("Firm");
                 });
 
-            modelBuilder.Entity("DbModel.Flight", b =>
+            modelBuilder.Entity("TerminalDashboard.DbModel.Flight", b =>
                 {
-                    b.HasOne("DbModel.Airplane", "Airplane")
+                    b.HasOne("TerminalDashboard.DbModel.Airplane", "Airplane")
                         .WithMany("Flights")
                         .HasForeignKey("AirplaneID")
                         .IsRequired()
                         .HasConstraintName("FK_Flights_Airplanes");
 
+                    b.HasOne("TerminalDashboard.DbModel.Airport", "From")
+                        .WithMany()
+                        .HasForeignKey("FromIdent");
+
+                    b.HasOne("TerminalDashboard.DbModel.Airport", "To")
+                        .WithMany()
+                        .HasForeignKey("ToIdent");
+
                     b.Navigation("Airplane");
+
+                    b.Navigation("From");
+
+                    b.Navigation("To");
                 });
 
-            modelBuilder.Entity("DbModel.Passenger", b =>
+            modelBuilder.Entity("TerminalDashboard.DbModel.Passenger", b =>
                 {
-                    b.HasOne("DbModel.Flight", "Flight")
+                    b.HasOne("TerminalDashboard.DbModel.Flight", "Flight")
                         .WithMany("Passengers")
                         .HasForeignKey("FlightId")
                         .IsRequired()
@@ -176,9 +254,9 @@ namespace TerminalDashboard.Migrations.Migrations
                     b.Navigation("Flight");
                 });
 
-            modelBuilder.Entity("DbModel.Suitcase", b =>
+            modelBuilder.Entity("TerminalDashboard.DbModel.Suitcase", b =>
                 {
-                    b.HasOne("DbModel.Passenger", "Passenger")
+                    b.HasOne("TerminalDashboard.DbModel.Passenger", "Passenger")
                         .WithMany("Suitcases")
                         .HasForeignKey("OwnerId")
                         .IsRequired()
@@ -187,22 +265,22 @@ namespace TerminalDashboard.Migrations.Migrations
                     b.Navigation("Passenger");
                 });
 
-            modelBuilder.Entity("DbModel.Airplane", b =>
+            modelBuilder.Entity("TerminalDashboard.DbModel.Airplane", b =>
                 {
                     b.Navigation("Flights");
                 });
 
-            modelBuilder.Entity("DbModel.Firm", b =>
+            modelBuilder.Entity("TerminalDashboard.DbModel.Firm", b =>
                 {
                     b.Navigation("Airplanes");
                 });
 
-            modelBuilder.Entity("DbModel.Flight", b =>
+            modelBuilder.Entity("TerminalDashboard.DbModel.Flight", b =>
                 {
                     b.Navigation("Passengers");
                 });
 
-            modelBuilder.Entity("DbModel.Passenger", b =>
+            modelBuilder.Entity("TerminalDashboard.DbModel.Passenger", b =>
                 {
                     b.Navigation("Suitcases");
                 });

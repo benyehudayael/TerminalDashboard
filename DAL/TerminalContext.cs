@@ -1,7 +1,6 @@
 ﻿
+using TerminalDashboard.DbModel;
 using Microsoft.EntityFrameworkCore;
-using DbModel;
-using System.Numerics;
 
 namespace DAL
 {
@@ -17,10 +16,12 @@ namespace DAL
         }
 
         public virtual DbSet<Airplane> Airplanes { get; set; } = null!;
+        public virtual DbSet<Airport> Airports { get; set; } = null!;
         public virtual DbSet<Firm> Firms { get; set; } = null!;
         public virtual DbSet<Flight> Flights { get; set; } = null!;
         public virtual DbSet<Suitcase> Suitcases { get; set; } = null!;
         public virtual DbSet<Passenger> Passengers { get; set; } = null!;
+        public virtual DbSet<Name> Name { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -86,27 +87,33 @@ namespace DAL
             {
                 entity.HasKey(i => i.ID);
 
-                entity.Property(e => e.ID)
-                    .ValueGeneratedNever()
-                    .HasColumnName("ID");
+                entity.Property(e => e.ID).HasMaxLength(200);
                 entity.Property(e => e.Name).HasMaxLength(200);
             });
 
-            modelBuilder.Entity<Flight>(entity =>
+            modelBuilder.Entity<Airplane>(entity =>
             {
                 entity.HasKey(i => i.ID);
 
-                entity.Property(e => e.DepartureTime).HasColumnType("datetime");
+                entity.Property(e => e.FirmID).HasMaxLength(200);
 
-                entity.Property(e => e.LandingTime).HasColumnType("datetime");
+                entity.Property(e => e.TotalSeats);
 
-                entity.Property(e => e.AirplaneID).HasMaxLength(200);
-
-                entity.HasOne(d => d.Airplane)
-                    .WithMany(p => p.Flights)
-                    .HasForeignKey(d => d.AirplaneID)
+                entity.HasOne(d => d.Firm)
+                    .WithMany(p => p.Airplanes)
+                    .HasForeignKey(d => d.FirmID)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Flights_Airplanes");
+                    .HasConstraintName("FK_Airplanes_Firms");
+            });
+            modelBuilder.Entity<Airport>(entity =>
+            {
+                entity.HasKey(i => i.Ident);
+            });
+            modelBuilder.Entity<Name>(entity =>
+            {
+                entity.HasKey(i => i.Id);
+                entity.Property(e => e.FirstName).HasMaxLength(200);
+                entity.Property(e => e.LastName).HasMaxLength(200);
             });
         }
 

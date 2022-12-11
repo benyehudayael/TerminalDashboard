@@ -8,10 +8,18 @@
 
   <ItemGroup>
     <None Remove="assets\airlines.csv" />
+    <None Remove="assets\Airports.csv" />
+    <None Remove="assets\Names.csv" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="assets\Airports.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="assets\airlines.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\Names.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -31,6 +39,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DAL\TerminalDashboard.DAL.csproj" />
+    <ProjectReference Include="..\TerminalDashboard.Common\TerminalDashboard.Common.csproj" />
   </ItemGroup>
 
 </Project>

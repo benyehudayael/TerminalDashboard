@@ -1,5 +1,5 @@
 ﻿using DAL;
-using DbModel;
+using TerminalDashboard.DbModel;
 
 namespace TerminalDashboard.Services
 {
@@ -11,6 +11,10 @@ namespace TerminalDashboard.Services
         {
             this.TerminalContext = TerminalContext;
         }
+        public void GetAirplane(Airplane airplane)
+        {
+            
+        }
         public void AddNewAirplane(Airplane airplane)
         {
             TerminalContext.Airplanes.Add(airplane);
@@ -18,6 +22,10 @@ namespace TerminalDashboard.Services
         }
 
         public void RemoveAirplane()
+        {
+
+        }
+        public void GetFirm(Airplane airplane)
         {
 
         }
@@ -31,6 +39,10 @@ namespace TerminalDashboard.Services
         {
 
         }
+        public void GetFlight(Airplane airplane)
+        {
+
+        }
         public void AddNewFlight(Flight flight)
         {
             TerminalContext.Flights.Add(flight);
@@ -41,6 +53,10 @@ namespace TerminalDashboard.Services
         {
 
         }
+        public void GetPassenger(Airplane airplane)
+        {
+
+        }
         public void AddNewPassenger(Passenger passenger)
         {
             TerminalContext.Passengers.Add(passenger);
@@ -48,6 +64,10 @@ namespace TerminalDashboard.Services
         }
 
         public void RemovePassenger()
+        {
+
+        }
+        public void GetSuitcase(Airplane airplane)
         {
 
         }

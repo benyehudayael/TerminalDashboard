@@ -1,8 +1,8 @@
-﻿namespace Model
+﻿namespace TerminalDashboard.Model
 {
     public class Firm
     {
-        public Guid ID { get; set; }
+        public string? ID { get; set; }
         public string? Name { get; set; }
     }
 }

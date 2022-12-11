@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DbModel
+namespace TerminalDashboard.DbModel
 {
     public class Flight
     {
@@ -10,8 +10,8 @@ namespace DbModel
         public string? ID { get; set; }
         public DateTime DepartureTime { get; set; }
         public DateTime LandingTime { get; set; }
-        public Guid From { get; set; }
-        public Guid To { get; set; }
+        public Airport? From { get; set; }
+        public Airport? To { get; set; }
         public Guid AirplaneID { get; set; }
 
         [ForeignKey("AirplaneID")]

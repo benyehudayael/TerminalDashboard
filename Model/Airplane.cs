@@ -1,9 +1,9 @@
-﻿namespace Model
+﻿namespace TerminalDashboard.Model
 {
     public class Airplane
     {
-        public string? ID { get; set; }
-        public Guid FirmID { get; set; }
+        public Guid ID { get; set; }
+        public string? FirmID { get; set; }
         public int TotalSeats { get; set; }
     }
 }
