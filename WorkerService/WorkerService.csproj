@@ -10,10 +10,12 @@
   <ItemGroup>
     <PackageReference Include="GeoCoordinate.NetCore" Version="1.0.0.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+    <PackageReference Include="Polly" Version="7.2.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DbModel\TerminalDashboard.DbModel.csproj" />
+    <ProjectReference Include="..\Services\TerminalDashboard.Services.csproj" />
     <ProjectReference Include="..\TerminalDashboard.Common\TerminalDashboard.Common.csproj" />
   </ItemGroup>
 </Project>

@@ -29,19 +29,27 @@ namespace WorkerService
             // calc flight duration by the distance
             Flight flight = new Flight();
             DateTime DepartureTime = GetRandomDateTime(DateTime.Now, DateTime.Now.AddHours(12));
+            Guid AirplaneID = airplanes[new Random().Next(airplanes.Count)].ID;
             if (new Random().Next(0, 100) % 2 == 0) {
+                flight.ID = new Guid().ToString();//DONE THIS!!!
                 flight.From = airports.Find(x => x.Ident == myAirportID);
                 flight.To = airports[new Random().Next(airports.Count)];
                 long flightDuration = CalcFlightDuration(CalcDistanceBetweenAirports(flight.From, flight.To));
                 DateTime LandingTime = DepartureTime + new TimeSpan(flightDuration);// Check this!!!!!
+                flight.LandingTime = LandingTime;
+                flight.DepartureTime = DepartureTime;
+                flight.AirplaneID = AirplaneID;
             }
             else
             {
+                flight.ID = new Guid().ToString();//DONE THIS!!!
                 flight.From = airports[new Random().Next(airports.Count)];
                 flight.To = airports.Find(x => x.Ident == myAirportID);
                 long flightDurationInMinutes = CalcFlightDuration(CalcDistanceBetweenAirports(flight.From, flight.To));
                 DateTime LandingTime = DepartureTime + new TimeSpan(flightDurationInMinutes * 600000000);
-
+                flight.LandingTime = LandingTime;
+                flight.DepartureTime = DepartureTime;
+                flight.AirplaneID = AirplaneID;
             }
             int TotalSeats = new Random().Next(70, 400);
             return flight;
@@ -65,17 +73,15 @@ namespace WorkerService
             };
             return passenger;
         }
-        public static Suitcase CreateSuitcase(List<Passenger> passengers, Guid OwnerID)
+        public static Suitcase CreateSuitcase(Guid OwnerID)
         {
-            Random rnd = new Random();
-            
             Suitcase suitcase = new()
             {
                 ID = Guid.NewGuid(),
-                Color = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256)).ToString(),
+                Color = Color.FromArgb(new Random().Next(256), new Random().Next(256), new Random().Next(256)).ToString(),
                 OwnerId = OwnerID,
-                Size = rnd.Next(1000),//Check this!!!
-                Weight = (float)rnd.NextDouble() * (400 - 50) + 50,
+                Size = new Random().Next(1000),//Check this!!!
+                Weight = (float)new Random().NextDouble() * (400 - 50) + 50,
             };
             return suitcase;
         }
