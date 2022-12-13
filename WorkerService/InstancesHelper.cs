@@ -1,8 +1,7 @@
 ﻿using GeoCoordinatePortable;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
-using TerminalDashboard.Common;
+using System.Security.Cryptography;
+using System.Text;
 using TerminalDashboard.DbModel;
 
 namespace WorkerService
@@ -13,6 +12,7 @@ namespace WorkerService
         {
             string? FirmID = firms[new Random().Next(0, firms.Count)].ID;
             int TotalSeats = new Random().Next(70, 400);
+
             Airplane airplane = new()
             {
                 ID = Guid.NewGuid(),
@@ -23,42 +23,28 @@ namespace WorkerService
         }
         public static Flight CreateFlight(string myAirportID, List<Airplane> airplanes, List<Airport> airports)
         {
-            // find my airport data from airports list by myAirportID
-            // Random 1 airport, the other one is our terminal taken from our config
-            // cals distance between airports
-            // calc flight duration by the distance
-            Flight flight = new Flight();
             DateTime DepartureTime = GetRandomDateTime(DateTime.Now, DateTime.Now.AddHours(12));
             Guid AirplaneID = airplanes[new Random().Next(airplanes.Count)].ID;
+
+            Flight flight = new Flight();
+            flight.ID = CreateFlightId();
+            flight.AirplaneID = AirplaneID;
+            flight.DepartureTime = DepartureTime;
+
             if (new Random().Next(0, 100) % 2 == 0) {
-                flight.ID = new Guid().ToString();//DONE THIS!!!
                 flight.From = airports.Find(x => x.Ident == myAirportID);
                 flight.To = airports[new Random().Next(airports.Count)];
-                long flightDuration = CalcFlightDuration(CalcDistanceBetweenAirports(flight.From, flight.To));
-                DateTime LandingTime = DepartureTime + new TimeSpan(flightDuration);// Check this!!!!!
-                flight.LandingTime = LandingTime;
-                flight.DepartureTime = DepartureTime;
-                flight.AirplaneID = AirplaneID;
             }
             else
             {
-                flight.ID = new Guid().ToString();//DONE THIS!!!
                 flight.From = airports[new Random().Next(airports.Count)];
                 flight.To = airports.Find(x => x.Ident == myAirportID);
-                long flightDurationInMinutes = CalcFlightDuration(CalcDistanceBetweenAirports(flight.From, flight.To));
-                DateTime LandingTime = DepartureTime + new TimeSpan(flightDurationInMinutes * 600000000);
-                flight.LandingTime = LandingTime;
-                flight.DepartureTime = DepartureTime;
-                flight.AirplaneID = AirplaneID;
             }
-            int TotalSeats = new Random().Next(70, 400);
-            return flight;
-        }
+            long flightDurationInMinutes = CalcFlightDuration(CalcDistanceBetweenAirports(flight.From, flight.To));
+            DateTime LandingTime = DepartureTime + new TimeSpan(flightDurationInMinutes * 600000000);
 
-        private static long CalcFlightDuration(double distance)
-        {
-            var kmPerMinute = 740.0 / 60;
-            return (long)(distance / 1000 / kmPerMinute);
+            flight.LandingTime = LandingTime;
+            return flight;
         }
 
         public static Passenger CreatePassenger(List<Flight> flights, List<Name> names)
@@ -85,13 +71,28 @@ namespace WorkerService
             };
             return suitcase;
         }
+        public static string CreateFlightId()
+        {
+            var sb = new StringBuilder();
+            string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            sb.Append(letters[new Random().Next(letters.Length)]);
+            sb.Append(letters[new Random().Next(letters.Length)]);
+            sb.Append(RandomNumberGenerator.GetInt32(100, 999));
+            return sb.ToString();
+        }
+
+        private static long CalcFlightDuration(double distance)
+        {
+            var kmPerMinute = 740.0 / 60;
+            return (long)(distance / 1000 / kmPerMinute);
+        }
 
         public static double CalcDistanceBetweenAirports(Airport airport1, Airport airport2)
         {
-            double lat = Convert.ToDouble(airport1.Coordinates.Split(",")[0]);
-            double lng = Convert.ToDouble(airport1.Coordinates.Split(",")[1]);
-            double lat1 = Convert.ToDouble(airport2.Coordinates.Split(",")[0]);
-            double lng1 = Convert.ToDouble(airport2.Coordinates.Split(",")[1]);
+            double lat = Convert.ToDouble(airport1?.Coordinates?.Split(",")[0]);
+            double lng = Convert.ToDouble(airport1?.Coordinates?.Split(",")[1]);
+            double lat1 = Convert.ToDouble(airport2?.Coordinates?.Split(",")[0]);
+            double lng1 = Convert.ToDouble(airport2?.Coordinates?.Split(",")[1]);
             var sCoord = new GeoCoordinate(lat, lng);
             var eCoord = new GeoCoordinate(lat1, lng1);
 

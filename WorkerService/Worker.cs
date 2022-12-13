@@ -1,3 +1,4 @@
+using DAL;
 using Microsoft.Extensions.Options;
 using TerminalDashboard.Common.Configuration;
 using TerminalDashboard.DbModel;
@@ -11,10 +12,10 @@ namespace WorkerService
         private readonly IOptions<MyAirport> _MyAirport;
 
         private DataService _dataService;
-        public Worker(ILogger<Worker> logger, DataService dataService, IOptions<MyAirport> MyAirport)
+        public Worker(ILogger<Worker> logger, IServiceProvider serviceProvider, IOptions<MyAirport> MyAirport)
         {
             _logger = logger;
-            _dataService = dataService;
+            _dataService = serviceProvider.CreateScope().ServiceProvider.GetRequiredService<DataService>();
             _MyAirport = MyAirport;
         }
 
@@ -23,16 +24,22 @@ namespace WorkerService
             while (!stoppingToken.IsCancellationRequested)
             {
                 List<Firm> firms = await _dataService.GetFirms();
+                Airplane airplane = InstancesHelper.CreateAirplane(firms);
+                _dataService.AddNewAirplane(airplane);
+
                 List<Airplane> airplanes = await _dataService.GetAirplanes();
                 List<Airport> airports = await _dataService.GetAirports();
+                Flight flight = InstancesHelper.CreateFlight(_MyAirport.Value.Ident.ToString(), airplanes, airports);
+                _dataService.AddNewFlight(flight);
+
                 List<Flight> flights = await _dataService.GetFlights();
                 List<Name> names = await _dataService.GetNames();
-                Guid OwnerId = await _dataService.GetRandomPassangerId();
+                Passenger passenger = InstancesHelper.CreatePassenger(flights, names);
+                _dataService.AddNewPassenger(passenger);
 
-                InstancesHelper.CreateAirplane(firms);
-                InstancesHelper.CreateFlight(_MyAirport.Value.Ident.ToString(), airplanes, airports);
-                InstancesHelper.CreatePassenger(flights, names);
-                InstancesHelper.CreateSuitcase(OwnerId);
+                Guid OwnerId = await _dataService.GetRandomPassangerId();
+                Suitcase suitcase = InstancesHelper.CreateSuitcase(OwnerId);
+                _dataService.AddNewSuitcase(suitcase);
 
 
                 _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);                

@@ -18,4 +18,12 @@
     <ProjectReference Include="..\Services\TerminalDashboard.Services.csproj" />
     <ProjectReference Include="..\TerminalDashboard.Common\TerminalDashboard.Common.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="appsettings.Local.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

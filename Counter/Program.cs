@@ -1,11 +1,6 @@
-
-using TerminalDashboard.Common.Configuration;
-using TerminalDashboard.Services;
-using WorkerService;
-
+using Counter;
 using DAL;
 using Microsoft.EntityFrameworkCore;
-
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((context, services) =>
@@ -16,9 +11,8 @@ IHost host = Host.CreateDefaultBuilder(args)
                 context.Configuration.GetConnectionString("DefaultConnection")//, x => x.MigrationsAssembly("TerminalDashboard.Migrations")
                 );
         });
-        services.AddScoped<DataService>();
+        services.AddScoped<TerminalContext>();
         services.AddHostedService<Worker>();
-        services.Configure<MyAirport>(context.Configuration.GetSection(nameof(MyAirport)));
     })
     .Build();
 

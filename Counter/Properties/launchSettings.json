@@ -1,10 +1,10 @@
 ﻿{
   "profiles": {
-    "WorkerService": {
+    "Counter": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "environmentVariables": {
-        "DOTNET_ENVIRONMENT": "Local"
+        "DOTNET_ENVIRONMENT": "Development"
       }
     }
   }
