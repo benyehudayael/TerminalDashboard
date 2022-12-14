@@ -8,5 +8,8 @@
       },
       "applicationUrl": "https://localhost:65071;http://localhost:65074"
     }
+  },
+  "MyAirport": {
+    "Ident": "LLHY"
   }
 }

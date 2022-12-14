@@ -1,6 +1,8 @@
 ﻿using DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using TerminalDashboard.Common.Configuration;
 using TerminalDashboard.DbModel;
 
 namespace TerminalDashboard.Services
@@ -8,10 +10,12 @@ namespace TerminalDashboard.Services
     public class DataService
     {
         private readonly TerminalContext _terminalContext;
+        private readonly MyAirport _myAirport;
 
-        public DataService(IServiceProvider serviceProvider)
+        public DataService(IServiceProvider serviceProvider, IOptions<MyAirport> MyAirport)
         {
             _terminalContext = serviceProvider.CreateScope().ServiceProvider.GetRequiredService<TerminalContext>();
+            _myAirport = MyAirport.Value;
         }
 
         // ----- Get ----- //
@@ -96,6 +100,33 @@ namespace TerminalDashboard.Services
                 return await query.FirstOrDefaultAsync();
             }
             catch (Exception) { throw; }
+        }
+        public async Task<Model.FlightSammary> GetFlightSammary(int lastMinutes)
+        {
+            var dateFrom = DateTime.Now.Subtract(TimeSpan.FromMinutes(lastMinutes));
+            int tookOff = await 
+                _terminalContext.Flights
+                .Include(x => x.From)
+                .Where(f =>
+                    f.DepartureTime < DateTime.Now && f.DepartureTime > dateFrom && f.From!.Ident == _myAirport.Ident)
+                .CountAsync();
+
+            //int tookOff = await (from f in _terminalContext.Flights
+            //          where f.DepartureTime < DateTime.Now && f.DepartureTime > DateTime.Now.Subtract(TimeSpan.FromMinutes(lastMinutes)) && f.From!.Ident == _myAirport.Ident
+            //          select f).CountAsync();
+            //int aboutToLand = await (from f in _terminalContext.Flights
+            //          where f.LandingTime > DateTime.Now && f.LandingTime < DateTime.Now.Add(TimeSpan.FromMinutes(lastMinutes)) && f.To!.Ident == _myAirport.Ident
+            //                         select f).CountAsync();
+            //int atTheAirport = await (from f in _terminalContext.Flights
+            //          where f.DepartureTime > DateTime.Now && f.From!.Ident == _myAirport.Ident || f.LandingTime < DateTime.Now && f.To!.Ident == _myAirport.Ident
+            //          select f).CountAsync();
+            Model.FlightSammary flightSammery = new()
+            {
+                TookOff = tookOff,
+                AboutToLand = 0, //aboutToLand,
+                AtTheAirport = 0//atTheAirport
+            };
+            return flightSammery;
         }
         //---- Add ----//
         public void AddNewPassenger(Passenger passenger)
