@@ -21,8 +21,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TerminalDashboard.Common", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TerminalDashboard.Mappers", "TerminalDashboard.Mappers\TerminalDashboard.Mappers.csproj", "{07AA8FFA-9249-4585-A180-D60A902E74B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Counter", "Counter\Counter.csproj", "{2092CC12-FFE0-4754-9764-A5846A8ED334}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,10 +63,6 @@ Global
 		{07AA8FFA-9249-4585-A180-D60A902E74B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{07AA8FFA-9249-4585-A180-D60A902E74B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{07AA8FFA-9249-4585-A180-D60A902E74B9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2092CC12-FFE0-4754-9764-A5846A8ED334}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2092CC12-FFE0-4754-9764-A5846A8ED334}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2092CC12-FFE0-4754-9764-A5846A8ED334}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2092CC12-FFE0-4754-9764-A5846A8ED334}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

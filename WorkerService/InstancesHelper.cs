@@ -1,4 +1,5 @@
 ﻿using GeoCoordinatePortable;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Security.Cryptography;
 using System.Text;
@@ -21,27 +22,31 @@ namespace WorkerService
             };
             return airplane;
         }
-        public static Flight CreateFlight(string myAirportID, List<Airplane> airplanes, List<Airport> airports)
+        public static Flight CreateFlight(string myAirportID, List<Airplane> airplanes, List<Airport> airports, DateTime Departure, List<Flight>  Flights)
         {
-            DateTime DepartureTime = GetRandomDateTime(DateTime.Now, DateTime.Now.AddHours(12));
             Guid AirplaneID = airplanes[new Random().Next(airplanes.Count)].ID;
 
             Flight flight = new Flight();
-            flight.ID = CreateFlightId();
+            flight.ID = CreateFlightId(Flights);
             flight.AirplaneID = AirplaneID;
-            flight.DepartureTime = DepartureTime;
+            flight.DepartureTime = Departure;
 
             if (new Random().Next(0, 100) % 2 == 0) {
-                flight.From = airports.Find(x => x.Ident == myAirportID);
-                flight.To = airports[new Random().Next(airports.Count)];
+                flight.FromAirport = airports.Find(x => x.Ident == myAirportID);
+                flight.ToAirport = airports[new Random().Next(airports.Count)];
+                flight.FromIdent = myAirportID;
+                flight.ToIdent = flight.ToAirport.Ident;
             }
             else
             {
-                flight.From = airports[new Random().Next(airports.Count)];
-                flight.To = airports.Find(x => x.Ident == myAirportID);
+                flight.FromAirport = airports[new Random().Next(airports.Count)];
+                flight.ToAirport = airports.Find(x => x.Ident == myAirportID);
+                flight.FromIdent = flight.FromAirport.Ident;
+                flight.ToIdent = myAirportID;
+
             }
-            long flightDurationInMinutes = CalcFlightDuration(CalcDistanceBetweenAirports(flight.From, flight.To));
-            DateTime LandingTime = DepartureTime + new TimeSpan(flightDurationInMinutes * 600000000);
+            long flightDurationInMinutes = CalcFlightDuration(CalcDistanceBetweenAirports(flight.FromAirport, flight.ToAirport));
+            DateTime LandingTime = Departure + new TimeSpan(flightDurationInMinutes * 600000000);
 
             flight.LandingTime = LandingTime;
             return flight;
@@ -49,15 +54,26 @@ namespace WorkerService
 
         public static Passenger CreatePassenger(List<Flight> flights, List<Name> names)
         {
-            Passenger passenger = new()
+            try
             {
-                ID = Guid.NewGuid(),
-                FirstName = names[new Random().Next(0, names.Count)].FirstName,
-                LastName = names[new Random().Next(0, names.Count)].LastName,
-                Age = new Random().Next(1, 100),
-                FlightId = flights[new Random().Next(0, flights.Count)].ID
-            };
-            return passenger;
+                Passenger passenger = new()
+                {
+                    ID = Guid.NewGuid(),
+                    FirstName = names[new Random().Next(0, names.Count)].FirstName,
+                    LastName = names[new Random().Next(0, names.Count)].LastName,
+                    Age = new Random().Next(1, 100),
+                    FlightId = flights
+                        .Where(x => x.Airplane.TotalSeats > x.Passengers?.Count)
+                        .ToArray()[new Random().Next(0, flights.Count)].ID
+                };
+                return passenger;
+            }
+            catch (Exception)
+            {
+
+                return new Passenger();
+            }
+           
         }
         public static Suitcase CreateSuitcase(Guid OwnerID)
         {
@@ -71,7 +87,7 @@ namespace WorkerService
             };
             return suitcase;
         }
-        public static string CreateFlightId()
+        public static string CreateFlightId(List<Flight> flights)
         {
             var sb = new StringBuilder();
             string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";

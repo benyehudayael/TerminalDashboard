@@ -28,8 +28,8 @@ namespace TerminalDashboard.Mappers
             ID = flight.ID,
             DepartureTime = flight.DepartureTime,
             LandingTime = flight.LandingTime,
-            From = AirportFromModel(flight.From),
-            To = AirportFromModel(flight.To),
+            FromIdent = flight.FromIdent,
+            ToIdent = flight.ToIdent,
             AirplaneID = flight.AirplaneID
         };
         public static Model.Flight FlightToModel(DbModel.Flight flight)
@@ -39,8 +39,8 @@ namespace TerminalDashboard.Mappers
                 ID = flight.ID,
                 DepartureTime = flight.DepartureTime,
                 LandingTime = flight.LandingTime,
-                From = AirportToModel(flight.From),
-                To = AirportToModel(flight.To),
+                FromIdent = flight.FromIdent,
+                ToIdent = flight.ToIdent,
                 AirplaneID = flight.AirplaneID
             };
         }

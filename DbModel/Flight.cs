@@ -10,8 +10,14 @@ namespace TerminalDashboard.DbModel
         public string? ID { get; set; }
         public DateTime DepartureTime { get; set; }
         public DateTime LandingTime { get; set; }
-        public Airport? From { get; set; }
-        public Airport? To { get; set; }
+        public string? FromIdent { get; set; }
+        public string? ToIdent { get; set; }
+
+        [ForeignKey("FromIdent")]
+        public Airport? FromAirport { get; set; }
+        [ForeignKey("ToIdent")]
+        public Airport? ToAirport { get; set; }
+
         public Guid AirplaneID { get; set; }
 
         [ForeignKey("AirplaneID")]

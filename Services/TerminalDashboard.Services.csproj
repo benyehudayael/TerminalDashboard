@@ -10,6 +10,7 @@
     <ProjectReference Include="..\DAL\TerminalDashboard.DAL.csproj" />
     <ProjectReference Include="..\Model\TerminalDashboard.Model.csproj" />
     <ProjectReference Include="..\TerminalDashboard.Common\TerminalDashboard.Common.csproj" />
+    <ProjectReference Include="..\TerminalDashboard.Mappers\TerminalDashboard.Mappers.csproj" />
   </ItemGroup>
 
 </Project>
