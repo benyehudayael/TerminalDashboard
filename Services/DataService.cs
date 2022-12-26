@@ -164,13 +164,19 @@ namespace TerminalDashboard.Services
             int tookOff = await 
                 _terminalContext.Flights
                     .Include(x => x.FromAirport)
-                    .Where(f => f.DepartureTime < DateTime.Now && f.DepartureTime > dateFrom && f.FromIdent == _myAirport.Ident)
+                    .Include(x => x.ToAirport)
+                    .Where(f => (lastMinutes == 30 && f.DepartureTime > DateTime.Now) ||
+                                (lastMinutes == -30 && f.DepartureTime < DateTime.Now) &&
+                                f.DepartureTime < dateTo && f.FromIdent == _myAirport.Ident)
                     .CountAsync();
             int aboutToLand = await
                 _terminalContext.Flights
+                    .Include(x => x.FromAirport)
                     .Include(x => x.ToAirport)
-                    .Where(f => f.LandingTime > DateTime.Now && f.LandingTime < dateTo && f.ToIdent == _myAirport.Ident)
-                    .CountAsync();0
+                    .Where(f => (lastMinutes == 30 && f.LandingTime > DateTime.Now && f.LandingTime < dateTo) ||
+                                (lastMinutes == -30 && f.LandingTime < DateTime.Now && f.LandingTime > dateTo)
+                                 && f.ToIdent == _myAirport.Ident)
+                    .CountAsync();
             int atTheAirport = await 
                 _terminalContext.Flights
                     .Include(x => x.FromAirport)
