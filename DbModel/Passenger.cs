@@ -10,7 +10,7 @@ namespace TerminalDashboard.DbModel
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public int Age { get; set; }
-        public string? FlightId { get; set; }
+        public Guid FlightId { get; set; }
 
         [ForeignKey("FlightId")]
         public virtual Flight Flight { get; set; } = null!;

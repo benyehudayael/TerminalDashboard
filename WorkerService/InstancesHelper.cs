@@ -27,7 +27,8 @@ namespace WorkerService
             Guid AirplaneID = airplanes[new Random().Next(airplanes.Count)].ID;
 
             Flight flight = new Flight();
-            flight.ID = CreateFlightId(Flights);
+            flight.Id = new Guid();
+            flight.NumberId = CreateFlightId(Flights);
             flight.AirplaneID = AirplaneID;
             flight.DepartureTime = Departure;
 
@@ -64,7 +65,7 @@ namespace WorkerService
                     Age = new Random().Next(1, 100),
                     FlightId = flights
                         .Where(x => x.Airplane.TotalSeats > x.Passengers?.Count)
-                        .ToArray()[new Random().Next(0, flights.Count)].ID
+                        .ToArray()[new Random().Next(0, flights.Count)].Id
                 };
                 return passenger;
             }

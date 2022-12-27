@@ -2,7 +2,9 @@ using DAL;
 using Microsoft.EntityFrameworkCore;
 using TerminalDashboard.Common.Configuration;
 using TerminalDashboard.Services;
-
+using Microsoft.EntityFrameworkCore.SqlServer;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 try
 {
@@ -45,10 +47,11 @@ try
     using (var scope = app.Services.CreateScope())
     {
         var services = scope.ServiceProvider;
-
         var context = services.GetRequiredService<TerminalContext>();
-
-        context.Database.Migrate();
+        if (!string.IsNullOrWhiteSpace(builder.Configuration["DownMigration"]))
+            await context.GetInfrastructure().GetService<IMigrator>()!.MigrateAsync(builder.Configuration["DownMigration"]);
+        else
+            await context.Database.MigrateAsync();
     }
 
     app.MapGet("/", () => "Hello World!");

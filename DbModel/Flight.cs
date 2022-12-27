@@ -6,8 +6,9 @@ namespace TerminalDashboard.DbModel
     public class Flight
     {
         [Key]
+        public Guid Id { get; set; }
         [MaxLength(10)]
-        public string? ID { get; set; }
+        public string? NumberId { get; set; }
         public DateTime DepartureTime { get; set; }
         public DateTime LandingTime { get; set; }
         public string? FromIdent { get; set; }

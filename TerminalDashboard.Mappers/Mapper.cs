@@ -25,7 +25,8 @@ namespace TerminalDashboard.Mappers
         }
         public static DbModel.Flight FlightFromModel(Model.Flight flight) => new DbModel.Flight()
         {
-            ID = flight.ID,
+            Id = flight.Id,
+            NumberId= flight.NumberId,
             DepartureTime = flight.DepartureTime,
             LandingTime = flight.LandingTime,
             FromIdent = flight.FromIdent,
@@ -36,7 +37,8 @@ namespace TerminalDashboard.Mappers
         {
             return new Model.Flight()
             {
-                ID = flight.ID,
+                Id = flight.Id,
+                NumberId= flight.NumberId,
                 DepartureTime = flight.DepartureTime,
                 LandingTime = flight.LandingTime,
                 FromIdent = flight.FromIdent,

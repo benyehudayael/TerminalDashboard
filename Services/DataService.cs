@@ -138,7 +138,7 @@ namespace TerminalDashboard.Services
             try
             {
                 var query = from p in _terminalContext.Passengers
-                            join f in _terminalContext.Flights on p.FlightId equals f.ID
+                            join f in _terminalContext.Flights on p.FlightId equals f.Id
                             join s in _terminalContext.Suitcases on p.ID equals s.OwnerId into ps
                             from s in ps.DefaultIfEmpty()
                             where f.DepartureTime > DateTime.Now

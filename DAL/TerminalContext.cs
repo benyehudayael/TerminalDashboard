@@ -42,7 +42,7 @@ namespace DAL
 
                 entity.Property(e => e.LastName).HasMaxLength(200);
 
-                entity.Property(e => e.FlightId).HasMaxLength(10);
+                entity.Property(e => e.FlightId);
 
                 entity.HasOne(d => d.Flight)
                     .WithMany(p => p.Passengers)
@@ -68,7 +68,9 @@ namespace DAL
 
             modelBuilder.Entity<Flight>(entity =>
             {
-                entity.HasKey(i => i.ID);
+                entity.HasKey(i => i.Id);
+
+                entity.Property(e => e.NumberId).HasMaxLength(10);
 
                 entity.Property(e => e.DepartureTime).HasColumnType("datetime");
 
