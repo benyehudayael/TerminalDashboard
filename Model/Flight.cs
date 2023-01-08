@@ -13,5 +13,6 @@ namespace TerminalDashboard.Model
         public string? FromIdent { get; set; }
         public string? ToIdent { get; set; }
         public Guid AirplaneID { get; set; }
+        public Airplane? Airplane { get; set; }
     }
 }

@@ -5,13 +5,13 @@ using TerminalDashboard.Services;
 
 namespace WorkerService
 {
-    public class DataManipulatorWorker : BackgroundService
+    public class PassengerCreator : BackgroundService
     {
-        private readonly ILogger<DataManipulatorWorker> _logger;
+        private readonly ILogger<PassengerCreator> _logger;
         private readonly IOptions<MyAirport> _MyAirport;
 
         private DataService _dataService;
-        public DataManipulatorWorker(ILogger<DataManipulatorWorker> logger, IServiceProvider serviceProvider, IOptions<MyAirport> MyAirport)
+        public PassengerCreator(ILogger<PassengerCreator> logger, IServiceProvider serviceProvider, IOptions<MyAirport> MyAirport)
         {
             _logger = logger;
             _dataService = serviceProvider.CreateScope().ServiceProvider.GetRequiredService<DataService>();
@@ -20,38 +20,38 @@ namespace WorkerService
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            List<Name> names = await _dataService.GetNames();
+            
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
                 {
-                    //List<Firm> firms = await _dataService.GetFirms();
-                    //Airplane airplane = InstancesHelper.CreateAirplane(firms);
-                    //_dataService.AddNewAirplane(airplane);
-
-                    List<Name> names = await _dataService.GetNames();  
                     List<Flight> flights = await _dataService.GetFlightsWithPassengers();
-                    Passenger passenger = InstancesHelper.CreatePassenger(flights, names);
-                    if (passenger.Age > 0)
+                    var relevantFlights = flights.Where(x => x.Airplane.TotalSeats > x.Passengers?.Count).ToList();
+                    if (relevantFlights.Count > 0)
                     {
+                        Passenger passenger = InstancesHelper.CreatePassenger(relevantFlights, names);
+
                         _dataService.AddNewPassenger(passenger);
 
-                        Guid OwnerId = passenger.ID; /*await _dataService.GetRandomPassangerId();*/
+                        Guid OwnerId = passenger.ID;
                         var random = new Random();
                         for (int i = 0; i < random.Next(1, 2); i++)
                         {
                             Suitcase suitcase = InstancesHelper.CreateSuitcase(OwnerId);
                             _dataService.AddNewSuitcase(suitcase);
                         }
-                    }
 
-                    _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+                        _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+                        await Task.Delay(1000, stoppingToken);
+                    }
+                    else
+                        await Task.Delay(60000, stoppingToken);
                 }
                 catch(Exception e)
                 {
-
+                    _logger.LogError("Worker failed at: {time} with exception {exception}", DateTimeOffset.Now, e);
                 }
-
-                await Task.Delay(1000, stoppingToken);
             }
         }
     }

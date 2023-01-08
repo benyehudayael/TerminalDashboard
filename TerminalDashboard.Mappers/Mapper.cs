@@ -43,7 +43,8 @@ namespace TerminalDashboard.Mappers
                 LandingTime = flight.LandingTime,
                 FromIdent = flight.FromIdent,
                 ToIdent = flight.ToIdent,
-                AirplaneID = flight.AirplaneID
+                AirplaneID = flight.AirplaneID,
+                Airplane = Mapper.AirplaneToModel(flight.Airplane)
             };
         }
         public static DbModel.Airport AirportFromModel(Model.Airport airport)

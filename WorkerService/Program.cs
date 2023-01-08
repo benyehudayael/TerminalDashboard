@@ -18,7 +18,7 @@ try
                     );
             });
             services.AddScoped<DataService>();
-            services.AddHostedService<DataManipulatorWorker>();
+            services.AddHostedService<PassengerCreator>();
             services.AddHostedService<FlightsCreator>();
             //services.AddHostedService<CountsPrintWorker>();
             services.Configure<MyAirport>(context.Configuration.GetSection(nameof(MyAirport)));

@@ -16,11 +16,11 @@ namespace TerminalDashboard.Controllers
         }
 
         [HttpGet]
-        public async Task<List<dynamic>> GetFlights(int lastMinutes)
+        public async Task<List<dynamic>> GetFlights(int delay, int scopeInMinutes)
         {
             try
             {
-                var data = await _dataService.GetLastFlights(lastMinutes);
+                var data = await _dataService.GetIncomingFlights(delay, scopeInMinutes);
                 return data;
             }
             catch (Exception e)
@@ -34,7 +34,7 @@ namespace TerminalDashboard.Controllers
         //{
         //    try
         //    {
-        //        var data = await _dataService.GetLastFlights(lastMinutes);
+        //        var data = await _dataService.GetIncomingFlights(lastMinutes);
         //        return data;
         //    }
         //    catch (Exception e)

@@ -22,59 +22,49 @@ namespace WorkerService
             };
             return airplane;
         }
-        public static Flight CreateFlight(string myAirportID, List<Airplane> airplanes, List<Airport> airports, DateTime Departure, List<Flight>  Flights)
+        public static Flight CreateFlight(string myAirportID, List<Airplane> airplanes, List<Airport> airports, DateTime date, List<Flight>  Flights)
         {
             Guid AirplaneID = airplanes[new Random().Next(airplanes.Count)].ID;
 
-            Flight flight = new Flight();
+            Flight flight = new();
             flight.Id = new Guid();
             flight.NumberId = CreateFlightId(Flights);
             flight.AirplaneID = AirplaneID;
-            flight.DepartureTime = Departure;
 
             if (new Random().Next(0, 100) % 2 == 0) {
                 flight.FromAirport = airports.Find(x => x.Ident == myAirportID);
                 flight.ToAirport = airports[new Random().Next(airports.Count)];
                 flight.FromIdent = myAirportID;
                 flight.ToIdent = flight.ToAirport.Ident;
+                flight.DepartureTime = date;
+                long flightDurationInMinutes = CalcFlightDuration(CalcDistanceBetweenAirports(flight.FromAirport!, flight.ToAirport!));
+                flight.LandingTime = date + new TimeSpan(flightDurationInMinutes * 600000000);
             }
             else
             {
-                flight.FromAirport = airports[new Random().Next(airports.Count)];
-                flight.ToAirport = airports.Find(x => x.Ident == myAirportID);
-                flight.FromIdent = flight.FromAirport.Ident;
-                flight.ToIdent = myAirportID;
-
+              flight.FromAirport = airports[new Random().Next(airports.Count)];
+              flight.ToAirport = airports.Find(x => x.Ident == myAirportID);
+              flight.FromIdent = flight.FromAirport.Ident;
+              flight.ToIdent = myAirportID;
+              flight.LandingTime = date;
+              long flightDurationInMinutes = CalcFlightDuration(CalcDistanceBetweenAirports(flight.FromAirport!, flight.ToAirport!));
+              flight.DepartureTime = date - new TimeSpan(flightDurationInMinutes * 600000000);
             }
-            long flightDurationInMinutes = CalcFlightDuration(CalcDistanceBetweenAirports(flight.FromAirport, flight.ToAirport));
-            DateTime LandingTime = Departure + new TimeSpan(flightDurationInMinutes * 600000000);
 
-            flight.LandingTime = LandingTime;
             return flight;
         }
 
         public static Passenger CreatePassenger(List<Flight> flights, List<Name> names)
         {
-            try
+            Passenger passenger = new()
             {
-                Passenger passenger = new()
-                {
-                    ID = Guid.NewGuid(),
-                    FirstName = names[new Random().Next(0, names.Count)].FirstName,
-                    LastName = names[new Random().Next(0, names.Count)].LastName,
-                    Age = new Random().Next(1, 100),
-                    FlightId = flights
-                        .Where(x => x.Airplane.TotalSeats > x.Passengers?.Count)
-                        .ToArray()[new Random().Next(0, flights.Count)].Id
-                };
-                return passenger;
-            }
-            catch (Exception)
-            {
-
-                return new Passenger();
-            }
-           
+                ID = Guid.NewGuid(),
+                FirstName = names[new Random().Next(0, names.Count)].FirstName,
+                LastName = names[new Random().Next(0, names.Count)].LastName,
+                Age = new Random().Next(1, 100),
+                FlightId = flights[new Random().Next(0, flights.Count)].Id
+            };
+            return passenger;
         }
         public static Suitcase CreateSuitcase(Guid OwnerID)
         {

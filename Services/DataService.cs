@@ -29,10 +29,10 @@ namespace TerminalDashboard.Services
             catch (Exception) { throw; }
         }
 
-        public async Task<List<dynamic>> GetLastFlights(int minutes)
+        public async Task<List<dynamic>> GetIncomingFlights(int delay, int scopeInMinutes)
         {
-            var nowPlus40Min = DateTime.Now.Add(TimeSpan.FromMinutes(minutes));
-            var nowMinus40Min = DateTime.Now.Subtract(TimeSpan.FromMinutes(minutes));
+            var nowPlusDelay = DateTime.Now.Add(TimeSpan.FromMinutes(delay));
+            var nowPlusDelayPlusScope = nowPlusDelay.Add(TimeSpan.FromMinutes(scopeInMinutes));
             try
             {
                 var data = await _terminalContext.Flights
@@ -45,11 +45,11 @@ namespace TerminalDashboard.Services
                         Time = x.ToIdent == _myAirport.Ident ? x.LandingTime : x.DepartureTime
                     })
                     .Where(f => 
-                        (f.Flight.DepartureTime < nowPlus40Min && 
-                        f.Flight.DepartureTime > DateTime.Now.AddMinutes(-1) && 
+                        (f.Flight.DepartureTime < nowPlusDelayPlusScope && 
+                        f.Flight.DepartureTime > nowPlusDelay && 
                         f.Flight.FromIdent == _myAirport.Ident) || 
-                        (f.Flight.LandingTime > nowMinus40Min && 
-                        f.Flight.LandingTime < DateTime.Now.AddMinutes(1) && 
+                        (f.Flight.LandingTime > nowPlusDelay && 
+                        f.Flight.LandingTime < nowPlusDelayPlusScope && 
                         f.Flight.ToIdent == _myAirport.Ident))
                     .OrderByDescending(x => x.Time)
                     .ToListAsync();
@@ -159,31 +159,34 @@ namespace TerminalDashboard.Services
             var lastMinutesInTimeSpan = TimeSpan.FromMinutes(lastMinutes);
             var dateFrom = DateTime.Now.Subtract(lastMinutesInTimeSpan);
             var dateTo = DateTime.Now.Add(lastMinutesInTimeSpan);
+            var nowPlus30 = DateTime.Now.Add(TimeSpan.FromMinutes(30));
+            var nowMinus30 = DateTime.Now.Subtract(TimeSpan.FromMinutes(30));
             var nowPlusTimeToUnLoad = DateTime.Now.Add(TimeSpan.FromMinutes(10));
             var nowMinusTimeToUnLoad = DateTime.Now.Subtract(TimeSpan.FromMinutes(10));
-            int tookOff = await 
+
+            int aboutToTakeOff = await 
                 _terminalContext.Flights
                     .Include(x => x.FromAirport)
                     .Include(x => x.ToAirport)
-                    .Where(f => (lastMinutes == 30 && f.DepartureTime > DateTime.Now) ||
-                                (lastMinutes == -30 && f.DepartureTime < DateTime.Now) &&
-                                f.DepartureTime < dateTo && f.FromIdent == _myAirport.Ident)
+                    .Where(f => ((lastMinutes == 30 && f.DepartureTime > DateTime.Now && f.DepartureTime < dateTo) ||
+                                (lastMinutes == -30 && f.DepartureTime < DateTime.Now && f.DepartureTime > dateTo)) &&
+                                 f.FromIdent == _myAirport.Ident)
                     .CountAsync();
             int aboutToLand = await
                 _terminalContext.Flights
                     .Include(x => x.FromAirport)
                     .Include(x => x.ToAirport)
-                    .Where(f => (lastMinutes == 30 && f.LandingTime > DateTime.Now && f.LandingTime < dateTo) ||
-                                (lastMinutes == -30 && f.LandingTime < DateTime.Now && f.LandingTime > dateTo)
+                    .Where(f => ((lastMinutes == 30 && f.LandingTime > DateTime.Now && f.LandingTime < dateTo) ||
+                                (lastMinutes == -30 && f.LandingTime < DateTime.Now && f.LandingTime > dateTo))
                                  && f.ToIdent == _myAirport.Ident)
                     .CountAsync();
             int atTheAirport = await 
                 _terminalContext.Flights
                     .Include(x => x.FromAirport)
                     .Include(x => x.ToAirport)
-                    .Where(f => (
-                        (f.DepartureTime > DateTime.Now && f.DepartureTime < dateTo && f.FromIdent == _myAirport.Ident) || 
-                        (f.LandingTime < DateTime.Now && f.LandingTime > dateFrom && f.ToIdent == _myAirport.Ident)))
+                    .Where(f => 
+                        (f.DepartureTime > DateTime.Now && f.DepartureTime < nowPlus30 && f.FromIdent == _myAirport.Ident) || 
+                        (f.LandingTime < DateTime.Now && f.LandingTime > nowMinus30 && f.ToIdent == _myAirport.Ident))
                     .CountAsync();
             int sumOfAirplanes = await
                 _terminalContext.Airplanes.CountAsync();
@@ -191,19 +194,19 @@ namespace TerminalDashboard.Services
                 _terminalContext.Passengers
                     .Include(x => x.Flight)
                     .Where(p => 
-                        (p.Flight.DepartureTime < dateTo && p.Flight.DepartureTime > DateTime.Now) || 
-                        (p.Flight.LandingTime < DateTime.Now && p.Flight.LandingTime > dateFrom))
+                        (p.Flight.DepartureTime < nowPlus30 && p.Flight.DepartureTime > DateTime.Now && p.Flight.FromIdent == _myAirport.Ident) || 
+                        (p.Flight.LandingTime < DateTime.Now && p.Flight.LandingTime > nowMinus30 && p.Flight.ToIdent == _myAirport.Ident))
                     .CountAsync();
-            int tookOffPassengers = await
+            int passengersAboutToTakeOff = await
                 _terminalContext.Passengers
                     .Include(x => x.Flight)
-                    .Where(p => p.Flight.DepartureTime < DateTime.Now && p.Flight.DepartureTime > dateFrom && p.Flight.FromIdent == _myAirport.Ident)
+                    .Where(p => p.Flight.DepartureTime < nowPlus30 && p.Flight.DepartureTime > DateTime.Now && p.Flight.FromIdent == _myAirport.Ident)
                     .CountAsync();
-            int landSoonPassengers = await
+            int landedPassengers = await
                  _terminalContext.Passengers
                 .Include(x => x.Flight)
                 .Where(p =>
-                    p.Flight.LandingTime > DateTime.Now && p.Flight.LandingTime < dateTo && p.Flight.ToIdent == _myAirport.Ident)
+                    p.Flight.LandingTime < DateTime.Now && p.Flight.LandingTime > nowMinus30 && p.Flight.ToIdent == _myAirport.Ident)
                 .CountAsync();
             int suitcasesWaitingToBeUnloaded = await 
                 _terminalContext.Suitcases
@@ -222,13 +225,13 @@ namespace TerminalDashboard.Services
                 .CountAsync();
             Model.Summary Sammery = new()
             {
-                TookOff = tookOff,
+                AboutToTakeOff = aboutToTakeOff,
                 AboutToLand = aboutToLand,
                 AtTheAirport = atTheAirport,
                 SumOfAirplanes = sumOfAirplanes,
                 PassengersInTheAirportArea = passengersInTheAirportArea,
-                TookOffPassengers = tookOffPassengers,
-                LandSoonPassengers = landSoonPassengers,
+                PassengersAboutToTakeOff = passengersAboutToTakeOff,
+                LandedPassengers = landedPassengers,
                 SuitcasesWaitingToBeUnloaded = suitcasesWaitingToBeUnloaded,
                 SuitcasesOnAConveyorBelt = suitcasesOnAConveyorBelt,
                 SuitcasesWaitingToBeloaded = suitcasesWaitingToBeloaded
